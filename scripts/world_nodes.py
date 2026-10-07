@@ -26,7 +26,7 @@ MAX_FILE_BYTES = 8 * 1024 * 1024
 MAX_CHUNK_BYTES = 16 * 1024 * 1024
 MAX_REGION_BYTES = 64 * 1024 * 1024
 MAX_NODE_BLOCKS = 65_536
-MAX_TOTAL_BLOCKS = 1_000_000
+MAX_TOTAL_BLOCKS = 8_000_000
 MAX_NODE_FILES = 128
 COLORS = ('white', 'orange', 'magenta', 'light_blue', 'yellow', 'lime', 'pink', 'gray',
           'light_gray', 'cyan', 'purple', 'blue', 'brown', 'green', 'red', 'black')
@@ -325,6 +325,7 @@ def scan_world(
     """Retain only relevant materials before clustering and applying the candidate-block limit."""
     blocks = {}
     materials = {}
+    entries = {}
 
     def material_for(block: str) -> Material | None:
         if block not in materials:
@@ -351,15 +352,25 @@ def scan_world(
                         continue
                     if pos in blocks:
                         raise ValueError(f'Duplicate saved block coordinate {pos}')
-                    blocks[pos] = material, block
+                    # Reuse one value tuple per block type rather than allocating it per coordinate.
+                    if block not in entries:
+                        entries[block] = material, block
+                    blocks[pos] = entries[block]
                     if len(blocks) > MAX_TOTAL_BLOCKS:
-                        raise ValueError('Survey exceeds 1,000,000 candidate blocks; narrow it using --bounds')
+                        raise ValueError(f'Survey exceeds {MAX_TOTAL_BLOCKS:,} candidate blocks; narrow it using --bounds')
     return blocks
 
 
-def cluster_blocks(blocks: dict[POSITION, tuple[Material, str]], world_id: str, origin: POSITION = (0, 0, 0)) -> list[dict]:
+def cluster_blocks(
+    blocks: dict[POSITION, tuple[Material, str]],
+    world_id: str,
+    origin: POSITION = (0, 0, 0),
+    *,
+    consume: bool = False,
+) -> list[dict]:
     """Flood-fill each face-connected component once; sorting makes output and IDs deterministic."""
-    remaining = dict(blocks)
+    # The CLI owns its scan result and can release visited entries; callers retain copy semantics.
+    remaining = blocks if consume else dict(blocks)
     nodes = []
     for start in sorted(blocks):
         if start not in remaining:
@@ -368,7 +379,7 @@ def cluster_blocks(blocks: dict[POSITION, tuple[Material, str]], world_id: str, 
         stack, members, types = [start], [], {block_type}
         while stack:
             pos = stack.pop()
-            members.append(tuple(pos[i] - origin[i] for i in range(3)))
+            members.append(pos if origin == (0, 0, 0) else tuple(pos[i] - origin[i] for i in range(3)))
             x, y, z = pos
             for neighbor in ((x - 1, y, z), (x + 1, y, z), (x, y - 1, z),
                              (x, y + 1, z), (x, y, z - 1), (x, y, z + 1)):
@@ -389,8 +400,6 @@ def cluster_blocks(blocks: dict[POSITION, tuple[Material, str]], world_id: str, 
             raise ValueError('Node ID exceeds 128 characters; shorten the world ID or material name')
         nodes.append({'id': node_id, 'kind': material.kind,
                       'material': material.name, 'blockTypes': sorted(types), 'blocks': members})
-    if len(nodes) > 20_000:
-        raise ValueError('Survey exceeds 20,000 clusters')
     return nodes
 
 
@@ -399,8 +408,40 @@ def json_text(data: dict) -> str:
     text = json.dumps(data, indent=2) + '\n'
     text = re.sub(r'\[\s*(-?\d+),\s*(-?\d+),\s*(-?\d+)\s*\]', r'[\1, \2, \3]', text)
     if len(text.encode('utf-8')) > MAX_FILE_BYTES:
-        raise ValueError('JSON output exceeds 8 MiB; narrow the survey using --bounds')
+        raise ValueError('JSON output exceeds the per-file limit')
     return text
+
+
+def survey_files(world_id: str, scope: dict, nodes: list[dict]) -> list[tuple[str, str]]:
+    """Split on whole-node boundaries, retaining the usual filename for a small survey."""
+    header = json.dumps({'schemaVersion': 1, **scope}, indent=2)[:-2] + ',\n  "nodes": [\n'
+    footer = '\n  ]\n}\n'
+    overhead = len((header + footer).encode('utf-8'))
+    parts, records, size = [], [], overhead
+    for node in nodes:
+        text = json_text(node).rstrip()
+        text = '\n'.join('    ' + line for line in text.splitlines())
+        node_size = len(text.encode('utf-8'))
+        if overhead + node_size > MAX_FILE_BYTES:
+            raise ValueError(f'Node {node["id"]} alone exceeds the per-file limit')
+        if records and (len(records) >= 20_000 or size + 2 + node_size > MAX_FILE_BYTES):
+            parts.append(header + ',\n'.join(records) + footer)
+            records, size = [], overhead
+        size += node_size + (2 if records else 0)
+        records.append(text)
+    parts.append(header + ',\n'.join(records) + footer)
+    if len(parts) == 1:
+        return [(f'{world_id}.json', parts[0])]
+    if len(world_id) > 55:
+        raise ValueError('Split survey IDs must be at most 55 characters')
+    return [(f'{world_id}-part-{i:03}.json', text) for i, text in enumerate(parts, start=1)]
+
+
+def survey_path(path: str, world_id: str) -> bool:
+    """Recognize only this export's base filename and numeric parts when updating its index."""
+    return path == f'mining/nodes/{world_id}.json' or re.fullmatch(
+        rf'mining/nodes/{re.escape(world_id)}-part-\d{{3}}\.json', path,
+    ) is not None
 
 
 def atomic_write(path: Path, text: str) -> None:
@@ -451,7 +492,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument('--origin', type=int, nargs=3, default=[0, 0, 0], metavar=('X', 'Y', 'Z'), help='Subtract this origin for TEMPLATE coordinates')
     parser.add_argument('--bounds', type=int, nargs=6, metavar=('MIN_X', 'MIN_Y', 'MIN_Z', 'MAX_X', 'MAX_Y', 'MAX_Z'), help='Inclusive survey box (may cut nodes at its edges)')
     parser.add_argument('--rules', type=Path, help='JSON mapping Minecraft IDs to {kind, material}, or null to exclude')
-    parser.add_argument('--output-dir', type=Path, default=REPO_ROOT / 'mining/nodes', help='One JSON per input world')
+    parser.add_argument('--output-dir', type=Path, default=REPO_ROOT / 'mining/nodes', help='JSON surveys, split into bounded files when needed')
     parser.add_argument('--no-index', action='store_true', help='Do not register files in the adjacent mining/nodes.json index')
     args = parser.parse_args(argv)
     try:
@@ -467,7 +508,7 @@ def main(argv: list[str] | None = None) -> int:
         index = json.loads(index_path.read_text(encoding='utf-8')) if not args.no_index and index_path.exists() else {'schemaVersion': 1, 'files': []}
         if index.get('schemaVersion') != 1 or not isinstance(index.get('files', []), list):
             raise ValueError('Invalid node index')
-        ids, pending = set(), []
+        ids, pending, world_ids = set(), [], []
         for value in args.worlds:
             if '=' in value:
                 world_id, path = value.split('=', 1)
@@ -478,18 +519,23 @@ def main(argv: list[str] | None = None) -> int:
             if not re.fullmatch(r'[A-Za-z0-9_-]{1,64}', world_id) or world_id.lower() in ids:
                 raise ValueError(f'Invalid or duplicate world ID {world_id}')
             ids.add(world_id.lower())
+            world_ids.append(world_id)
             scope = make_scope(args, world_id)
             source = Path(path).expanduser()
             print(f'Reading {source} …', flush=True)
             # Mineshaft catalogs are for gemstone routes; other islands keep every supported kind.
             allowed_kinds = {'GEMSTONE'} if scope['island'] == 'MINESHAFT' else None
             blocks = scan_world(source, rules, args.bounds, allowed_kinds=allowed_kinds)
-            nodes = cluster_blocks(blocks, world_id, tuple(args.origin))
-            text = json_text({'schemaVersion': 1, **scope, 'nodes': nodes})
-            pending.append((output / f'{world_id}.json', text))
-            print(f'  {len(blocks):,} blocks → {len(nodes):,} clusters; {dict(Counter(n["material"] for n in nodes))}')
+            count = len(blocks)
+            nodes = cluster_blocks(blocks, world_id, tuple(args.origin), consume=True)
+            parts = survey_files(world_id, scope, nodes)
+            pending.extend((output / name, text) for name, text in parts)
+            # Drop coordinate lists before processing another world; output parts now own the data.
+            print(f'  {count:,} blocks → {len(nodes):,} clusters in {len(parts)} file(s); {dict(Counter(n["material"] for n in nodes))}')
+            del nodes, blocks, parts
         if not args.no_index:
-            files = set(index.get('files', [])) | {f'mining/nodes/{p.name}' for p, _ in pending}
+            files = {path for path in index.get('files', []) if not any(survey_path(path, name) for name in world_ids)}
+            files |= {f'mining/nodes/{p.name}' for p, _ in pending}
             if len(files) > MAX_NODE_FILES or any(not re.fullmatch(r'mining/nodes/[A-Za-z0-9_-]{1,64}\.json', p) for p in files):
                 raise ValueError('Invalid index file paths or more than 128 files')
             index['files'] = sorted(files)

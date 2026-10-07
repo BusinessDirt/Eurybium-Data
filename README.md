@@ -39,4 +39,4 @@ Use Python 3.10+ without additional dependencies:
 python3 scripts/world_nodes.py JASP1=dev/worlds/jasper-mineshaft.zip --island MINESHAFT
 ```
 
-This writes `mining/nodes/JASP1.json` and registers it in `mining/nodes.json`. Multiple `ID=PATH` inputs are supported. Mineshaft surveys export only gemstone nodes; other islands retain all supported material kinds. See [the world-node guide](docs/world-nodes.md) for material rules, template coordinates, output format, and limits.
+This writes `mining/nodes/JASP1.json` and registers it in `mining/nodes.json`. Large worlds automatically produce numbered part files without splitting clusters. Multiple `ID=PATH` inputs are supported. Mineshaft surveys export only gemstone nodes; other islands retain all supported material kinds. See [the world-node guide](docs/world-nodes.md) for material rules, template coordinates, output format, and limits.

@@ -207,6 +207,45 @@ class WorldNodesTest(unittest.TestCase):
                 selected = w.scan_world(source, w.load_rules(rules), allowed_kinds={'GEMSTONE'})
                 self.assertEqual(1, len(selected))
 
+    def test_large_surveys_split_without_cutting_nodes_or_changing_ids(self):
+        material = w.Material('ORE', 'IRON')
+        blocks = {(i * 3 + x, 0, 0): (material, 'minecraft:iron_ore') for i in range(8) for x in (0, 1)}
+        nodes = w.cluster_blocks(blocks, 'large')
+        scope = {'island': 'CRYSTAL_HOLLOWS', 'space': 'WORLD'}
+        small = w.survey_files('large', scope, nodes)
+        self.assertEqual(['large.json'], [name for name, _ in small])
+        with patch.object(w, 'MAX_FILE_BYTES', 900):
+            parts = w.survey_files('large', scope, nodes)
+            self.assertGreater(len(parts), 1)
+            combined = []
+            for name, text in parts:
+                self.assertRegex(name, r'large-part-\d{3}\.json')
+                self.assertLessEqual(len(text.encode('utf-8')), 900)
+                catalog = json.loads(text)
+                self.assertEqual('CRYSTAL_HOLLOWS', catalog['island'])
+                self.assertTrue(all(len(node['blocks']) == 2 for node in catalog['nodes']))
+                combined.extend(catalog['nodes'])
+            self.assertEqual(json.loads(json.dumps(nodes)), combined)
+        self.assertTrue(w.survey_path('mining/nodes/large.json', 'large'))
+        self.assertTrue(w.survey_path('mining/nodes/large-part-001.json', 'large'))
+        self.assertFalse(w.survey_path('mining/nodes/large-other.json', 'large'))
+        consumed = dict(blocks)
+        self.assertEqual(nodes, w.cluster_blocks(consumed, 'large', consume=True))
+        self.assertEqual({}, consumed)
+
+    def test_reexport_replaces_index_parts_and_keeps_other_surveys(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / 'nodes'
+            index = output.parent / 'nodes.json'
+            index.write_text(json.dumps({'schemaVersion': 1, 'files': [
+                'mining/nodes/large-part-001.json', 'mining/nodes/large-part-002.json', 'mining/nodes/JASP1.json',
+            ]}))
+            material = w.Material('GEMSTONE', 'RED_GLASS')
+            blocks = {(0, 0, 0): (material, 'minecraft:red_stained_glass')}
+            with patch.object(w, 'scan_world', return_value=blocks), patch('sys.stdout', new=io.StringIO()):
+                self.assertEqual(0, w.main(['large=unused.zip', '--island', 'CRYSTAL_HOLLOWS', '--output-dir', str(output)]))
+            self.assertEqual(['mining/nodes/JASP1.json', 'mining/nodes/large.json'], json.loads(index.read_text())['files'])
+
     def test_corruption_and_unsupported_compression_fail_explicitly(self):
         for data, compression in ((b'abc', 2), (b'abc', 4), (zlib.compress(b'abc')[:-1], 2)):
             with self.assertRaises((ValueError, zlib.error)):
