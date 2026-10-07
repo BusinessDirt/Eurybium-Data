@@ -25,7 +25,6 @@
     "mining/nodes/RUBY2.json",
     "mining/nodes/RUBYC.json",
     "mining/nodes/SAPP1.json",
-    "mining/nodes/TOPA1.json",
-    "mining/nodes/glacite-tunnels.json"
+    "mining/nodes/TOPA1.json"
   ]
 }
