@@ -315,9 +315,23 @@ def load_rules(path: Path | None) -> dict[str, Material | None]:
     return rules
 
 
-def scan_world(source: Path, rules: dict[str, Material | None], bounds: list[int] | None = None) -> dict[POSITION, tuple[Material, str]]:
+def scan_world(
+    source: Path,
+    rules: dict[str, Material | None],
+    bounds: list[int] | None = None,
+    *,
+    allowed_kinds: set[str] | None = None,
+) -> dict[POSITION, tuple[Material, str]]:
+    """Retain only relevant materials before clustering and applying the candidate-block limit."""
     blocks = {}
     materials = {}
+
+    def material_for(block: str) -> Material | None:
+        if block not in materials:
+            material = classify(block, rules)
+            materials[block] = material if material is not None and (allowed_kinds is None or material.kind in allowed_kinds) else None
+        return materials[block]
+
     with World(source) as world:
         for root, cx, cz in world.chunks():
             chunk = root.get('Level', root)
@@ -325,13 +339,11 @@ def scan_world(source: Path, rules: dict[str, Material | None], bounds: list[int
             for section in sections:
                 # Most sections contain no candidate blocks. Avoid decoding 4096 air/stone entries.
                 palette = section.get('block_states', {}).get('palette', section.get('Palette'))
-                if palette is not None and not any(classify(item['Name'], rules) for item in palette):
+                if palette is not None and not any(material_for(item['Name']) for item in palette):
                     continue
                 sy = section['Y'] * 16
                 for i, block in section_blocks(section, root.get('DataVersion', 0)):
-                    if block not in materials:
-                        materials[block] = classify(block, rules)
-                    material = materials[block]
+                    material = material_for(block)
                     if material is None:
                         continue
                     pos = cx * 16 + (i & 15), sy + (i >> 8), cz * 16 + ((i >> 4) & 15)
@@ -469,7 +481,9 @@ def main(argv: list[str] | None = None) -> int:
             scope = make_scope(args, world_id)
             source = Path(path).expanduser()
             print(f'Reading {source} …', flush=True)
-            blocks = scan_world(source, rules, args.bounds)
+            # Mineshaft catalogs are for gemstone routes; other islands keep every supported kind.
+            allowed_kinds = {'GEMSTONE'} if scope['island'] == 'MINESHAFT' else None
+            blocks = scan_world(source, rules, args.bounds, allowed_kinds=allowed_kinds)
             nodes = cluster_blocks(blocks, world_id, tuple(args.origin))
             text = json_text({'schemaVersion': 1, **scope, 'nodes': nodes})
             pending.append((output / f'{world_id}.json', text))

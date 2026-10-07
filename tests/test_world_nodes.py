@@ -176,6 +176,37 @@ class WorldNodesTest(unittest.TestCase):
                 self.assertEqual(0, w.main([f'JASP1={source}', '--island', 'MINESHAFT', '--output-dir', str(output), '--no-index']))
             self.assertEqual('{invalid index', (output.parent / 'nodes.json').read_text())
 
+    def test_mineshaft_exports_only_gemstones_while_other_islands_keep_all_kinds(self):
+        values = [0] * 4096
+        values[0], values[1], values[2] = 1, 2, 3
+        names = ['minecraft:air', 'minecraft:red_stained_glass', 'minecraft:iron_ore', 'minecraft:prismarine']
+        section = {'Y': (1, 0), 'block_states': (10, {
+            'palette': (9, (10, [{'Name': (8, name)} for name in names])),
+            'data': (12, packed(values, 4, True)),
+        })}
+        raw = b'\x0a\0\0' + payload(10, {'DataVersion': (3, 3000), 'xPos': (3, 0), 'zPos': (3, 0),
+                                         'sections': (9, (10, [section]))})
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            source = base / 'mixed.zip'
+            with ZipFile(source, 'w') as zip_file:
+                zip_file.writestr('Example/level.dat', b'')
+                zip_file.writestr('Example/region/r.0.0.mca', region({(0, 0): raw})[0])
+            rules = base / 'rules.json'
+            rules.write_text(json.dumps({'minecraft:prismarine': {'kind': 'MITHRIL', 'material': 'MITHRIL'}}))
+            for island, kinds in [('MINESHAFT', {'GEMSTONE'}), ('CRYSTAL_HOLLOWS', {'GEMSTONE', 'ORE', 'MITHRIL'})]:
+                output = base / island / 'nodes'
+                with patch('sys.stdout', new=io.StringIO()):
+                    self.assertEqual(0, w.main([f'JASP1={source}', '--island', island, '--rules', str(rules),
+                                               '--output-dir', str(output)]))
+                nodes = json.loads((output / 'JASP1.json').read_text())['nodes']
+                self.assertEqual(kinds, {node['kind'] for node in nodes})
+                self.assertEqual(len(kinds), sum(len(node['blocks']) for node in nodes))
+            # Irrelevant ores must not consume the gemstone survey's candidate limit.
+            with patch.object(w, 'MAX_TOTAL_BLOCKS', 1):
+                selected = w.scan_world(source, w.load_rules(rules), allowed_kinds={'GEMSTONE'})
+                self.assertEqual(1, len(selected))
+
     def test_corruption_and_unsupported_compression_fail_explicitly(self):
         for data, compression in ((b'abc', 2), (b'abc', 4), (zlib.compress(b'abc')[:-1], 2)):
             with self.assertRaises((ValueError, zlib.error)):

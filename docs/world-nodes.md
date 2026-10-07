@@ -25,7 +25,9 @@ The default output is `mining/nodes/<ID>.json`, and the adjacent `mining/nodes.j
 
 A node is a maximal connected component with a single `(kind, material)` key. Connectivity means sharing one of six faces: diagonal and corner contact do not join clusters. Membership joins across section, chunk, and region boundaries. Glass blocks and panes of the same color share a key. Stone/deepslate variants of an ore share its ore key. Block properties such as pane attachments and redstone lighting do not split a cluster. A node ID combines world ID, material, and its smallest coordinate, making it stable when unrelated nodes are added; changing that anchor or merging/splitting clusters can change IDs.
 
-Defaults include vanilla ores, ancient debris, clear glass, and all stained-glass colors. Glass materials use explicit physical names like `MAGENTA_GLASS`; the tool does not assume every colored window is a gemstone. Use block rules to translate known colors to gemstone names, include Hypixel blocks such as mithril, or exclude decoration:
+Mineshaft surveys (`--island MINESHAFT`) export only `GEMSTONE` nodes. Ores and mithril are excluded before clustering and do not consume the candidate-block limit, including when custom rules classify them. Other islands retain every supported kind (`GEMSTONE`, `ORE`, and `MITHRIL`).
+
+Default block classification includes vanilla ores, ancient debris, clear glass, and all stained-glass colors. Glass materials use explicit physical names like `MAGENTA_GLASS`; the tool does not assume every colored window is a gemstone. Use block rules to translate known colors to gemstone names, include Hypixel blocks such as mithril, or exclude decoration:
 
 ```json
 {
