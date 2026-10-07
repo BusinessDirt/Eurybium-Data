@@ -1,4 +1,253 @@
 {
   "schemaVersion": 1,
-  "worlds": []
+  "worlds": [
+    {
+      "id": "amber-mineshaft",
+      "name": "Amber Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/amber-mineshaft.zip",
+        "sha256": "8997652d3318bb7103227915c3d94845a6dd618a2d8430f36df1233cc9699e81"
+      }
+    },
+    {
+      "id": "amethyst-mineshaft",
+      "name": "Amethyst Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/amethyst-mineshaft.zip",
+        "sha256": "d5a101127085cbbaea2330e2450559fa52fd3c7c3ba89eb89c500f49363e3c2a"
+      }
+    },
+    {
+      "id": "aquamarine-crystal-mineshaft",
+      "name": "Aquamarine Crystal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/aquamarine-crystal-mineshaft.zip",
+        "sha256": "f2f5124a88798d80524f3794ef99c730ca4ffb2bce9fc94d7350ea37d2d6a80e"
+      }
+    },
+    {
+      "id": "aquamarine-one",
+      "name": "Aquamarine One",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/aquamarine-one.zip",
+        "sha256": "1be0e837068226fd4e140efca7c550cb6622f06d1853d1f3b27c3abcbfa0eb1f"
+      }
+    },
+    {
+      "id": "aquamarine-two-mineshaft",
+      "name": "Aquamarine Two Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/aquamarine-two-mineshaft.zip",
+        "sha256": "808237c2e8701813d7fe1d6cf4a86ba81bd156e5e8257ce27a69fc461c92bdc6"
+      }
+    },
+    {
+      "id": "citrine-crystal-mineshaft",
+      "name": "Citrine Crystal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/citrine-crystal-mineshaft.zip",
+        "sha256": "96e2248f8e0656cb4c5ad9db02e554cc8e3ecda0f53793a3b85a401ee1617012"
+      }
+    },
+    {
+      "id": "citrine-one-mineshaft",
+      "name": "Citrine One Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/citrine-one-mineshaft.zip",
+        "sha256": "c31cb9ed4a918d29e63b3eddcc3a08bc2770aaa217fa5a2e58233d588f622ca6"
+      }
+    },
+    {
+      "id": "citrine-two-mineshaft",
+      "name": "Citrine Two Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/citrine-two-mineshaft.zip",
+        "sha256": "a94d730ed0f921bc610c71800c4349f8d4bec594bb3bae7ce4099ef3fdc5d9dc"
+      }
+    },
+    {
+      "id": "clean-crystal-hollows",
+      "name": "Clean Crystal Hollows",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/clean-crystal-hollows.zip",
+        "sha256": "24dcf56fa84b4c557b2a6734827072af4bc88df1c5a72d8d1922b4474eb77522"
+      }
+    },
+    {
+      "id": "glacite-tunnels",
+      "name": "Glacite Tunnels",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/glacite-tunnels.zip",
+        "sha256": "11fa907bd379291692d14cc516963834447a082dcfb5d40e0966883a0de830f3"
+      }
+    },
+    {
+      "id": "jade-mineshaft",
+      "name": "Jade Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/jade-mineshaft.zip",
+        "sha256": "309b14029b3d8377531e331f43a64da9889d705dbf7d641ec30d52202c9f4614"
+      }
+    },
+    {
+      "id": "jasper-crystal-mineshaft",
+      "name": "Jasper Crystal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/jasper-crystal-mineshaft.zip",
+        "sha256": "c614ea8719900046287b5445955b6084aa9dcdfa4b3c51b30024f6437d9783dc"
+      }
+    },
+    {
+      "id": "jasper-mineshaft",
+      "name": "Jasper Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/jasper-mineshaft.zip",
+        "sha256": "fe878f40682d79dff7e6a542bd2422dee9ccd2f0bcadd8beae13232e4797af0e"
+      }
+    },
+    {
+      "id": "littlefoot-s-lair-mineshaft",
+      "name": "Littlefoot'S Lair Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/littlefoot-s-lair-mineshaft.zip",
+        "sha256": "cfffbbf1e556028be8e33e403b18b1a0d5c16e6ac61fd16a4fc6e6e935a094f1"
+      }
+    },
+    {
+      "id": "onyx-crystal-mineshaft",
+      "name": "Onyx Crystal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/onyx-crystal-mineshaft.zip",
+        "sha256": "753bd6e12e909af5979d9c9ae96ac1d32a1d839d07c78a107f50a8ae843d86f7"
+      }
+    },
+    {
+      "id": "onyx-mineshaft",
+      "name": "Onyx Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/onyx-mineshaft.zip",
+        "sha256": "0484f0e1808d01832ee7c7e30b83a47e13ae6759e0320f8da30ed8d193cc5e4c"
+      }
+    },
+    {
+      "id": "onyx-two-mineshaft",
+      "name": "Onyx Two Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/onyx-two-mineshaft.zip",
+        "sha256": "ee66e4d7112e61fcc6a6162f53e6a365f7a118c4fe2243e2abc5363096f1b2c7"
+      }
+    },
+    {
+      "id": "opal-crystal-mineshaft",
+      "name": "Opal Crystal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/opal-crystal-mineshaft.zip",
+        "sha256": "acb46132cb3cdeec5c9a756803c8eb0a9cff3ad7992cc27bb26e271ab7858758"
+      }
+    },
+    {
+      "id": "opal-mineshaft",
+      "name": "Opal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/opal-mineshaft.zip",
+        "sha256": "db54073672ed7d94dab65b70671e92cf219840d4ff7cbdb617b440b4134eee28"
+      }
+    },
+    {
+      "id": "peridot-crystal-mineshaft",
+      "name": "Peridot Crystal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/peridot-crystal-mineshaft.zip",
+        "sha256": "e13e1ab511e81617a9bccc288bb4169f9ee6aaae703d8e79653e4a447ef417e7"
+      }
+    },
+    {
+      "id": "peridot-one-mineshaft",
+      "name": "Peridot One Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/peridot-one-mineshaft.zip",
+        "sha256": "fe39be7c1ddd07146914e7a76d4da934285acdd9a7250ce96899d9f3ceffb62d"
+      }
+    },
+    {
+      "id": "peridot-two-mineshaft",
+      "name": "Peridot Two Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/peridot-two-mineshaft.zip",
+        "sha256": "d30dbe2973313b5687952b01133028110eed494ee3c8964e6a8cf9fcade44654"
+      }
+    },
+    {
+      "id": "ruby-crystal-mineshaft",
+      "name": "Ruby Crystal Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/ruby-crystal-mineshaft.zip",
+        "sha256": "3211e3a44ef8b008f44dbcb01c10887f88ed422e1f04cdea67c79bbecbc367cd"
+      }
+    },
+    {
+      "id": "ruby-one-mineshaft",
+      "name": "Ruby One Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/ruby-one-mineshaft.zip",
+        "sha256": "76a535092e4e56529b25b57655100af78b6e853d80eade33722c62b5180566fb"
+      }
+    },
+    {
+      "id": "ruby-two-mineshaft",
+      "name": "Ruby Two Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/ruby-two-mineshaft.zip",
+        "sha256": "b412da5522c36b17b9336bfd0871325f4acf99ec99e648580ac8bda37f2bcba3"
+      }
+    },
+    {
+      "id": "sapphire-mineshaft",
+      "name": "Sapphire Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/sapphire-mineshaft.zip",
+        "sha256": "e913ed02ccdc5e9865f27202abf999728d0411464580b7da0b62b635e0d2e7bf"
+      }
+    },
+    {
+      "id": "titanium-mineshaft",
+      "name": "Titanium Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/titanium-mineshaft.zip",
+        "sha256": "e5338cab937df260cebc46b5011a244588192ffa34cd260a561b59a72fd737e3"
+      }
+    },
+    {
+      "id": "topaz-mineshaft",
+      "name": "Topaz Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/topaz-mineshaft.zip",
+        "sha256": "134cd36fec6140a9a3a4cd4bc742e416e2b63d9cf7cfc5bdfbbf37e91e070388"
+      }
+    },
+    {
+      "id": "tungsten-mineshaft",
+      "name": "Tungsten Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/tungsten-mineshaft.zip",
+        "sha256": "5ce25b98676b89ef5b4d7790cab4de31efa4a4e26909fbcfd7b5c4b30d91d495"
+      }
+    },
+    {
+      "id": "umber-mineshaft",
+      "name": "Umber Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/umber-mineshaft.zip",
+        "sha256": "5c6405b7f2ca7c431384ca16354012216fcfae920f611a015b9f587996235b6c"
+      }
+    },
+    {
+      "id": "vanguard-mineshaft",
+      "name": "Vanguard Mineshaft",
+      "download": {
+        "url": "https://github.com/BusinessDirt/Eurybium-Data/releases/download/dev-worlds-v1/vanguard-mineshaft.zip",
+        "sha256": "df57a1447a01d5f2863aab15649ffa88ac71d514d50441b9a1af76b13759a89c"
+      }
+    }
+  ]
 }
