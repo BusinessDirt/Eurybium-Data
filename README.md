@@ -7,7 +7,7 @@ The mod retrieves these files from one resolved commit on `master` and caches th
 
 - `patterns/chat.json` and `patterns/scoreboard.json`: `{ "schemaVersion": 1, "patterns": [{ "id": "stable.pattern.id", "pattern": "regex" }] }`. IDs are unique across both files.
 - `mining/routes.json`: `{ "schemaVersion": 1, "routes": [] }`. Records contain a reserved route `id`, `island`, optional `region`/`mineshaft`, `space` (`WORLD` or `TEMPLATE`), and ordered `points` as integer `[x, y, z]` triples. Templates require a `layout` ID.
-- `mining/nodes.json`: `{ "schemaVersion": 1, "nodes": [] }`. Records contain a unique `id`, the same location/space metadata, `kind` (`GEMSTONE`, `ORE`, `MITHRIL`), uppercase `material`, and a nonempty `blocks` list.
+- `mining/nodes.json`: `{ "schemaVersion": 1, "files": [] }`. Lists per-world surveys such as `mining/nodes/JASP1.json`. Each survey declares a shared location/space scope and has `nodes` with unique `id`, `kind` (`GEMSTONE`, `ORE`, `MITHRIL`), uppercase `material`, Minecraft `blockTypes`, and integer `blocks`. Legacy inline nodes remain readable.
 
 Built-in shaft routes use IDs such as `eurybium:JASP1` and `eurybium:JASPC`. Spawning IDs are `eurybium:SHAFT_SPAWN_MITHRIL`, `eurybium:SHAFT_SPAWN_TUNGSTEN`, and `eurybium:SHAFT_SPAWN_GEMSTONES`; these use island `DWARVEN_MINES` and region `DWARVEN_BASE_CAMP`. Use only reserved IDs defined by the mod. Empty catalogs indicate that surveyed data has not yet been added.
 
@@ -29,3 +29,14 @@ It then asks for another key. Enter `q`, an empty key, or press Ctrl+C to finish
 The three `SHAFT_SPAWN_*` keys are also supported and receive the Dwarven Base Camp scope automatically. This tool assumes pasted coordinates are world coordinates; template routes still need an explicit layout and placement contract.
 
 Run importer tests with `python3 -m unittest discover -s tests -v`.
+
+
+## Survey world node clusters
+
+Use Python 3.10+ without additional dependencies:
+
+```sh
+python3 scripts/world_nodes.py JASP1=dev/worlds/jasper-mineshaft.zip --island MINESHAFT
+```
+
+This writes `mining/nodes/JASP1.json` and registers it in `mining/nodes.json`. Multiple `ID=PATH` inputs are supported. See [the world-node guide](docs/world-nodes.md) for material rules, template coordinates, output format, and limits.

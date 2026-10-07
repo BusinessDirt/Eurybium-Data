@@ -1,4 +1,7 @@
 {
   "schemaVersion": 1,
-  "nodes": []
+  "files": [
+    "mining/nodes/JASP1.json",
+    "mining/nodes/JASPC.json"
+  ]
 }
