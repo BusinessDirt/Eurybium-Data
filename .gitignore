@@ -1,0 +1,10 @@
+# Local editors and operating-system files
+.idea/
+.vscode/
+.DS_Store
+
+# World archives, extracted test saves, and download caches
+*.zip
+run/
+saves/
+.cache/
