@@ -1,4 +1,9 @@
 {
   "schemaVersion": 1,
-  "patterns": []
+  "patterns": [
+    {
+      "id": "mining.ability.ready",
+      "pattern": "(?:§r)*§6(?<ability>[^§]+) (?:§r)*§ais now available!(?:§r)*"
+    }
+  ]
 }
