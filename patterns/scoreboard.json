@@ -4,6 +4,10 @@
     {
       "id": "skyblock.area.plain",
       "pattern": "\\s*(?<symbol>[⏣ф])\\s+(?<area>.+)"
+    },
+    {
+      "id": "hypixel.lobby.type",
+      "pattern": "(?<type>.*lobby)\\d+"
     }
   ]
 }
