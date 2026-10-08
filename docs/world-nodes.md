@@ -1,5 +1,7 @@
 # World node surveys
 
+The mod now consumes **gemstone mineshafts only**: one `mining/nodes/<SHAFT_KEY>.json` per known shaft, world-space coordinates, and gemstone glass/pane nodes. Existing uploaded mineshaft exports are compatible. The Python exporter remains general-purpose; other-island and split-file exports are for offline use (`--output-dir ... --no-index`) and must not be added to the runtime index.
+
 Run from the data repository root with Python 3.10+. No dependencies or running Minecraft client are required. ZIP archives are read directly and never extracted or modified; extracted save directories also work. A ZIP may contain either `level.dat` at its root or a single wrapper folder like `Example/level.dat`.
 
 ```sh
@@ -82,10 +84,8 @@ The reader supports Java Edition Anvil `.mca` data: legacy numeric sections (1.8
 
 Only candidate blocks are retained across chunks. Palette sections without candidates are skipped, and material classifications are reused. Scanning costs scale with saved chunk data; flood filling uses six neighbor checks per candidate, plus sorting for stable output. Memory scales with candidates and the largest region (limit 64 MiB), rather than storing the entire world. The CLI consumes its candidate map while clustering, reuses candidate value tuples and unshifted coordinates, and serializes in bounded files. This avoids duplicating millions of candidate entries. The scan and output batch still live in memory, so full-world surveys need more memory than individual shafts; this is not a streaming world database.
 
-Limits match the Kotlin catalog contract: 8 MiB per JSON file, 20,000 nodes per file, 65,536 blocks per node, 8,000,000 blocks across a runtime snapshot, 128 indexed files, 192 MiB combined repository source data and a 256 MiB encoded cache bundle, and signed 32-bit coordinates. Limits per survey are checked before writing. The combined catalog limits are enforced by Kotlin; do not assume that multiple individually valid surveys fit together. Survey limits are distinct from the planned 2,048-block **per-frame render budget**; storing a large cluster does not authorize rendering every block in it.
+Exporter limits remain 8 MiB and 20,000 nodes per output file, 65,536 blocks per node, 8,000,000 scanned blocks, and signed 32-bit coordinates. Large experimental exports split on whole-node boundaries.
+
+The simpler Kotlin runtime contract accepts only registered mineshaft filenames and `GEMSTONE` nodes using `WORLD` coordinates. Limits are 8 MiB per file, 20,000 nodes per file, 2,048 blocks per node, 250,000 node blocks total, 24 MiB combined repository source data, and a 64 MiB encoded cache. Nodes retain a typed mineshaft, material, immutable block positions, glass IDs, and source filename; ore/mithril kinds and node-template placement are no longer part of this runtime API. Route coordinate spaces remain independent. Node expansion config contains the Mineshaft Gemstones toggle and match range. The glow test selection cap remains 4,096 blocks.
 
 Run tests with `python3 -m unittest discover -s tests -v`. Tests include synthetic compressed ZIPs, external chunks, legacy IDs, both palette layouts, face connectivity across regions, diagonal separation, template origin, deterministic output, malformed data, and CLI/index behavior. Review generated data before committing it.
-
-A verification run of the supplied `clean-crystal-hollows.zip` produced 3,922,992 blocks in 205,905 clusters, split across 17 files. Most blocks are coal/iron ores. The Kotlin loader’s catalog and cache limits accommodate this complete export; its per-file limit remains 8 MiB. Full-world node data also increases runtime snapshot memory and refresh work; the renderer test tool still caps selections at 4,096 blocks. `--bounds` remains available when only one surveyed area is wanted.
-
-The complete exported dataset was also parsed and cached through the real Kotlin loader in a temporary integration test. It passed with a 2 GiB test heap; Gradle’s default 512 MiB test worker was insufficient for this full dataset. Normal unit tests remain on their default heap. This is a substantial full-world catalog, so Minecraft needs heap headroom for it in addition to its own world/render state.

@@ -6,12 +6,12 @@ This Repo is used as a JSON file storage for the Minecraft mod https://github.co
 The mod retrieves these files from one resolved commit on `master` and caches the validated revision:
 
 - `patterns/chat.json` and `patterns/scoreboard.json`: `{ "schemaVersion": 1, "patterns": [{ "id": "stable.pattern.id", "pattern": "regex" }] }`. IDs are unique across both files.
-- `mining/routes.json`: `{ "schemaVersion": 1, "routes": [] }`. Records contain a reserved route `id`, `island`, optional `region`/`mineshaft`, `space` (`WORLD` or `TEMPLATE`), and ordered `points` as integer `[x, y, z]` triples. Templates require a `layout` ID.
-- `mining/nodes.json`: `{ "schemaVersion": 1, "files": [] }`. Lists per-world surveys such as `mining/nodes/JASP1.json`. Each survey declares a shared location/space scope and has `nodes` with unique `id`, `kind` (`GEMSTONE`, `ORE`, `MITHRIL`), uppercase `material`, Minecraft `blockTypes`, and integer `blocks`. Legacy inline nodes remain readable.
+- `mining/routes.json`: `{ "schemaVersion": 1, "routes": [] }`. Records contain a reserved route `id`, `island`, optional `region`/`mineshaft`, `space` (`WORLD` or `TEMPLATE`), and ordered `points` as `[x, y, z]` or `[x, y, z, "nodeMaterial"]`. The optional material is a resource name or Minecraft block ID (for example `minecraft:magenta_stained_glass` for Jasper). Omitted, blank, or null values choose the nearest allowed resource. Gemstone shaft waypoints name their intended gemstone; mixed spawning waypoints leave it omitted. Templates require a `layout` ID.
+- `mining/nodes.json`: `{ "schemaVersion": 1, "files": [] }`. Lists per-world surveys such as `mining/nodes/JASP1.json`. Runtime surveys use one known mineshaft file (for example `JASP1.json`), `island: MINESHAFT`, `space: WORLD`, and `kind: GEMSTONE`. Nodes contain unique `id`, uppercase `material`, Minecraft glass `blockTypes`, and integer `blocks`.
 
 Built-in shaft routes use IDs such as `eurybium:JASP1` and `eurybium:JASPC`. Spawning IDs are `eurybium:SHAFT_SPAWN_MITHRIL`, `eurybium:SHAFT_SPAWN_TUNGSTEN`, and `eurybium:SHAFT_SPAWN_GEMSTONES`; these use island `DWARVEN_MINES` and region `DWARVEN_BASE_CAMP`. Use only reserved IDs defined by the mod. Empty catalogs indicate that surveyed data has not yet been added.
 
-For the full contract and validation limits, see [the mod's repository data documentation](https://github.com/BusinessDirt/Eurybium/blob/master/docs/repository-data.md). Schema documents are not required; the mod validates updates before publication. Development-world ZIP release assets remain separate from runtime catalogs.
+For the full contract and validation limits, see [the world-node guide](docs/world-nodes.md). Schema documents are not required; the mod validates updates before publication. Development-world ZIP release assets remain separate from runtime catalogs.
 
 
 ## Import Coleweight routes
@@ -39,4 +39,4 @@ Use Python 3.10+ without additional dependencies:
 python3 scripts/world_nodes.py JASP1=dev/worlds/jasper-mineshaft.zip --island MINESHAFT
 ```
 
-This writes `mining/nodes/JASP1.json` and registers it in `mining/nodes.json`. Large worlds automatically produce numbered part files without splitting clusters. Multiple `ID=PATH` inputs are supported. Mineshaft surveys export only gemstone nodes; other islands retain all supported material kinds. See [the world-node guide](docs/world-nodes.md) for material rules, template coordinates, output format, and limits.
+This writes `mining/nodes/JASP1.json` and registers it in `mining/nodes.json`. Large worlds automatically produce numbered part files without splitting clusters. Multiple `ID=PATH` inputs are supported. The mod consumes only gemstone mineshaft surveys. The general exporter can still process other islands for offline experiments; those exports are outside the runtime catalog. See [the world-node guide](docs/world-nodes.md) for material rules, template coordinates, output format, and limits.
