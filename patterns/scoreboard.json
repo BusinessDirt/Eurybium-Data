@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "patterns": [
     {
-      "id": "skyblock.area",
-      "pattern": "\\s*§\\d(?<symbol>.) §(?<color>.)(?<area>.*)"
+      "id": "skyblock.area.plain",
+      "pattern": "\\s*(?<symbol>[⏣ф])\\s+(?<area>.+)"
     }
   ]
 }
