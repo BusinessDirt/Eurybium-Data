@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "patterns": [
+    {
+      "id": "tab.widget.forzen_corpses",
+      "pattern": "\\s*(?:Frozen Corpses:)"
+    }
+  ]
+}
